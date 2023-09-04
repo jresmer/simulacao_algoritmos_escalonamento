@@ -3,6 +3,10 @@
 
 using namespace utils;
 
+Process::Process() {
+
+}
+
 Process::Process(int ct, int d, int p) {
     creation_time = ct;
     duration = d;

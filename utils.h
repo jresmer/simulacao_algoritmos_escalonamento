@@ -34,6 +34,7 @@ private:
     State state;
 
 public:
+    Process();
     explicit Process(int ct, int d, int p);
     ~Process();
     void func(int d);
@@ -63,6 +64,7 @@ class CPU {
         Process * process;      //processos
 
     public:
+        CPU();
         explicit CPU(Process * processes);
         ~CPU();
         void run();
@@ -71,22 +73,24 @@ class CPU {
         context get_context();
 };
 
-    class Scheduler {
+class Scheduler {
 
-    private:
-        CPU cpu;
-        Process ** processes;
-        bool done();
+private:
+    CPU cpu;
+    Process ** processes;
+    bool done();
+    int dummy;
 
-    public:
-        explicit Scheduler(); // rever
-        ~Scheduler();
-        void fcfs();
-        void sjf ();
-        void preemptive_priority();
-        void non_preemptive_priority();
-        void round_robin();
-    };
+public:
+    Scheduler();
+    explicit Scheduler(int d); // rever
+    ~Scheduler();
+    void fcfs();
+    void sjf ();
+    void preemptive_priority();
+    void non_preemptive_priority();
+    void round_robin();
+};
 
 
 

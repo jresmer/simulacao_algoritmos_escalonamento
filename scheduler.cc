@@ -3,8 +3,12 @@
 
 using namespace utils;
 
-explicit Scheduler::Scheduler() {
+Scheduler::Scheduler() {
 
+}
+
+explicit Scheduler::Scheduler(int d) {
+    dummy = d
 }
 
 Scheduler::~Scheduler() {
