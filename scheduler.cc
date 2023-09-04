@@ -3,9 +3,8 @@
 
 using namespace utils;
 
-Scheduler::Scheduler() {}
-
 explicit Scheduler::Scheduler() {
+
 }
 
 Scheduler::~Scheduler() {

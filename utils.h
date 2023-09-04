@@ -22,6 +22,27 @@ struct context
     long int * gp;
 };
 
+class Process {
+
+private:
+    int creation_time{};
+    int duration{};
+    int priority{};
+    int turnaround_time{};
+    int executed_time{};
+    int wait_time{};
+    State state;
+
+public:
+    explicit Process(int ct, int d, int p);
+    ~Process();
+    void func(int d);
+    void set_turnaround(int tt);
+    void set_wait_time(int wt);
+    void set_state_ready();
+    State get_state();
+};
+
 class OutputString {
     private:
     public:
@@ -30,24 +51,6 @@ class OutputString {
         void printInit(int np);
         void printDiagram(int np, int ti, Process*processos);
         void printFinal(int tt, float tme, int nttc);
-};
-
-class Scheduler {
-
-    private:
-        CPU cpu;
-        Process ** processes;
-        bool done();
-
-    public:
-        Scheduler();
-        explicit Scheduler(); // rever
-        ~Scheduler();
-        void fcfs();
-        void sjf ();
-        void preemptive_priority();
-        void non_preemptive_priority();
-        void round_robin();
 };
 
 class CPU {
@@ -60,7 +63,6 @@ class CPU {
         Process * process;      //processos
 
     public:
-        CPU();
         explicit CPU(Process * processes);
         ~CPU();
         void run();
@@ -69,28 +71,23 @@ class CPU {
         context get_context();
 };
 
-
-
-class Process {
+    class Scheduler {
 
     private:
-        int creation_time;
-        int duration;
-        int priority;
-        int turnaround_time;
-        int executed_time;
-        int wait_time;
-        State state;
+        CPU cpu;
+        Process ** processes;
+        bool done();
 
     public:
-        Process();
-        explicit Process(int ct, int d, int p);
-        ~Process();
-        void func(int d);
-        void set_turnaround(int tt);
-        void set_wait_time(int wt);
-        void set_state_ready();
-        State get_state();
-};
+        explicit Scheduler(); // rever
+        ~Scheduler();
+        void fcfs();
+        void sjf ();
+        void preemptive_priority();
+        void non_preemptive_priority();
+        void round_robin();
+    };
+
+
 
 } // closing namespace utils

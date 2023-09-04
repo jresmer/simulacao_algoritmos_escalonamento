@@ -2,10 +2,6 @@
 
 using namespace utils;
 
-CPU::CPU() {
-    
-}
-
 CPU::CPU(Process * processes) {
     sp = 0;
     pc = 0;
