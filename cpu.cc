@@ -3,7 +3,7 @@
 using namespace utils;
 
 CPU::CPU() {
-    
+
 }
 
 CPU::CPU(Process * processes) {

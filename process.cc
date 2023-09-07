@@ -3,6 +3,9 @@
 
 using namespace utils;
 
+Process::Process() {
+
+}
 
 Process::Process(int ct, int d, int p) {
     creation_time = ct;
@@ -36,3 +39,9 @@ void Process::func(int d) { // incompleto??
 void Process::set_state_ready() {
     state = Ready;
 }
+
+State Process::get_state() {
+    return state;
+}
+
+
