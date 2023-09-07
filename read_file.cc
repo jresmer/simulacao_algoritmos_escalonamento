@@ -1,29 +1,12 @@
+#include "src/utils.h"
+
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
 
 using namespace std;
-
-class ProcessParams
-{
-public:
-	ProcessParams(int c, int d, int p) { 
-		creation_time = c;
-		duration = d;
-		priority = p;
-	}
-
-	friend ostream &operator<<(ostream& os, const ProcessParams& p) {
-		os << "Creation time = " << p.creation_time << " duration = " << p.duration << " priority = " << p.priority << endl;
-		return os;
-	}
-	
-private:	
-	int creation_time;
-	int duration; //seconds
-	int priority;
-};
+using namespace utils;
 
 class File
 {
@@ -36,6 +19,13 @@ public:
 		}
 	}
 	
+	~File() {
+		for(int i = 0; i < processes.size() ; i++) {
+			ProcessParams *p = processes[i];
+			delete p;
+		}
+	}
+
 	void read_file() {
 	
 		int a, b, c;
@@ -61,16 +51,13 @@ public:
 		}
 	}
 
-	~File() {
-		for(int i = 0; i < processes.size() ; i++) {
-			ProcessParams *p = processes[i];
-			delete p;
-		}
+	vector<ProcessParams *> get_process_params() {
+		return processes;
 	}
 
 private:
-	ifstream myfile; 
 	vector<ProcessParams *> processes;
+	ifstream myfile; 
 };
 
 int main()
@@ -78,4 +65,23 @@ int main()
 	File f;
 	f.read_file();
 	f.print_processes_params();
+
+    CPU ine5412 = CPU();
+    Kernel k = Kernel(&ine5412, f.get_process_params());
+	k.run(1);
+	k.reset();
+
+	k.run(2);
+	k.reset();
+
+	k.run(3);
+	k.reset();
+
+	k.run(4);
+	k.reset();
+
+	k.run(5);
+	k.reset();
+
+	
 }
