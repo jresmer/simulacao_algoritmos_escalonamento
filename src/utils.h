@@ -76,9 +76,9 @@ class CPU {
     public:
         CPU();
         ~CPU();
-        void run();
+        void run();             //IMPLEMENTAR
         void set_context(context *c);
-        context get_context();
+        context* get_context();
 };
 
 
@@ -96,7 +96,7 @@ public:
     explicit Scheduler(vector<Process *> &p);
     ~Scheduler();
     bool done();
-    void run(int te);
+    int run(int te);
     void add_process(Process * p);
 };
 

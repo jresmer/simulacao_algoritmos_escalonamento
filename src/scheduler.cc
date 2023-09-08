@@ -16,24 +16,27 @@ void Scheduler::add_process(Process * p) {
     processes.push_back(p);
 }
 
-void Scheduler::run(int te) {
+int Scheduler::run(int te) {
+    int pid;
     switch(te) {
         case 1:
             // first come first serve
-            fcfs();
+            pid = fcfs();
         case 2:
             // shortest job first
-            sjf();
+            pid = sjf();
         case 3:
             // preemptive priority
-            priority(false);
+            pid = priority(false);
         case 4:
-            // non preemptive priority
-            priority(true);
+            // non-preemptive priority
+            pid = priority(true);
         case 5:
-            // round robin
-            round_robin();
+            // round-robin
+            pid = round_robin();
     }
+
+    return pid;
 }
 
 bool Scheduler::done() {

@@ -13,16 +13,18 @@ CPU::~CPU() {
     delete[] gp;
 }
 
+//IMPLEMENTAR
 void CPU::run() {
     
 }
 
-context CPU::get_context() {
-    context contexto;
-    contexto.sp = sp;
-    contexto.pc = pc;
-    contexto.status = st;
-    contexto.gp = gp;
+context* CPU::get_context() {
+    context* contexto;
+    contexto->sp = sp;
+    contexto->pc = pc;
+    contexto->status = st;
+    contexto->gp = gp;
+
     return contexto;
 }
 

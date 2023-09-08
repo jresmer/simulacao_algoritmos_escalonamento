@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <string>
 #include <vector>
 
 using namespace std;
@@ -83,5 +82,7 @@ int main()
 	k.run(5);
 	k.reset();
 
-	
+    k.~Kernel();
+    ine5412.~CPU();
+    f.~File();
 }
