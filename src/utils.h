@@ -15,7 +15,8 @@ enum State
         New = 1,
         Ready = 2,
         Executing = 3,
-        Finished = 4
+        Finished = 4,
+        NotCreated = 5
 };
 
 struct context
@@ -57,11 +58,14 @@ public:
 
 class OutputString {
 private:
+    int time;
+    int n_processes;
 public:
     OutputString();
+    explicit OutputString(int np);
     ~OutputString();
-    void printInit(int np);
-    void printDiagram(int np, int ti, Process*processos);
+    void printInit();
+    void printLine(vector<Process*> p);
     void printFinal(int tt, float tme, int nttc);
 };
 
@@ -125,6 +129,7 @@ class Kernel {
 private:
     CPU *cpu;
     Scheduler scheduler;
+    OutputString outputString;
     vector<ProcessParams *> processesParameters;
     vector<Process *> processes;
     vector<context *> processesContext;
@@ -136,8 +141,8 @@ public:
     explicit Kernel(CPU *c, vector<ProcessParams *> pp);
     ~Kernel();
     void run(int te);
-    void check_new_process(int created_pid);
-    void create_process(ProcessParams *pp, int created_pid);
+    void check_new_process();
+    void create_process(ProcessParams *pp);
     void reset();
 
 };

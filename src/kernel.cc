@@ -8,7 +8,9 @@ Kernel::Kernel() {
     processesContext = vector<context *>();
     processesParameters = vector<ProcessParams *>();
     scheduler = Scheduler();
+    outputString = OutputString();
     created_pid = 0;
+    time = 0;
 }
 
 Kernel::Kernel(CPU *c, vector<ProcessParams *> p) {
@@ -17,7 +19,10 @@ Kernel::Kernel(CPU *c, vector<ProcessParams *> p) {
     processes = vector<Process *>();
     processesContext = vector<context *>();
     scheduler = Scheduler();
+    outputString = OutputString(processesParameters.size());
     created_pid = 0;
+    time = 0;
+
 }
 
 Kernel::~Kernel() {
@@ -37,7 +42,7 @@ void Kernel::run(int tipoDeEscalonamento) {
     {
         //Verifica se tem processos a serem criados
         if (processesParameters.size() > processes.size()) {
-            check_new_process(created_pid);
+            check_new_process();
 
         //Verifica se todos os processo criados ja foram finalizados
         } else {
@@ -56,25 +61,26 @@ void Kernel::run(int tipoDeEscalonamento) {
         */
 
         //Incrementa o tempo que se passou
+        outputString.printLine(processes);
         time++;
     }
     
 }
 
 //Verifica se precisa criar novos processos ao comparar o tempo atual com o tempo que o processo deve ser criado
-void Kernel::check_new_process(int c_pid) {
+void Kernel::check_new_process() {
     for(int i = 0; i < processesParameters.size(); i++) {
         ProcessParams *pp = processesParameters[i];
         if (pp->get_creation_time() == time) {
-            create_process(pp, c_pid);
+            create_process(pp);
             created_pid++;
         }
     }
 }
 
 //Cria e armazena um processo e seu respectivo contexto
-void Kernel::create_process(ProcessParams *pp, int c_pid) {
-    Process *p = new Process(pp->get_creation_time(), pp->get_duration(), pp->get_priority(), c_pid);
+void Kernel::create_process(ProcessParams *pp) {
+    Process *p = new Process(pp->get_creation_time(), pp->get_duration(), pp->get_priority(), created_pid);
     processes.push_back(p);
     scheduler.add_process(p);
 
