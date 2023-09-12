@@ -1,7 +1,8 @@
 #include "utils.h"
+#include <iomanip>
 
 using namespace utils;
-
+using std::setw;
 
 OutputString::OutputString() {}
 

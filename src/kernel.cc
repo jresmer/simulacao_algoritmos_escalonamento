@@ -46,7 +46,8 @@ void Kernel::run(int tipoDeEscalonamento) {
 
         //Verifica se todos os processo criados ja foram finalizados
         } else {
-            executando = scheduler.done();
+            executando = !scheduler.done();
+            if (!executando) { break; }
         }
 
         //Roda o escalonador e busca qual processo deverá executar
@@ -54,14 +55,19 @@ void Kernel::run(int tipoDeEscalonamento) {
         pid = scheduler.run(tipoDeEscalonamento);
 
         //Seta o contexto do processo na CPU, faz as alterações e pega o contexto modificado -> VERIFICAR
-        /*
         cpu->set_context(processesContext[pid]);
-        cpu->run();
+        cpu->run(processes[pid]);
         processesContext[pid] = cpu->get_context();
+        /*
         */
 
-        //Incrementa o tempo que se passou
+        //Imprime o resultado da execução daquele segundo
         outputString.printLine(processes);
+
+        //Verifica se o processo executado terminou, caso sim, altera seu estado
+        processes[pid]->check_finished();
+
+        //Incrementa o tempo que se passou
         time++;
     }
     
@@ -80,11 +86,11 @@ void Kernel::check_new_process() {
 
 //Cria e armazena um processo e seu respectivo contexto
 void Kernel::create_process(ProcessParams *pp) {
-    Process *p = new Process(pp->get_creation_time(), pp->get_duration(), pp->get_priority(), created_pid);
+    Process* p = new Process(pp->get_creation_time(), pp->get_duration(), pp->get_priority(), created_pid);
     processes.push_back(p);
     scheduler.add_process(p);
 
-    context *ctx = new context;
+    context* ctx = new context;
     ctx->pc = 0;
     ctx->sp = 0;
     ctx->status = New;

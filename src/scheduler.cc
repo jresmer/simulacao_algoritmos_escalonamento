@@ -4,15 +4,16 @@
 using namespace std;
 using namespace utils;
 
-Scheduler::Scheduler() {}
-
-Scheduler::Scheduler(vector<Process*> &p) {
-    processes = p;
+Scheduler::Scheduler() {
+    processes = vector<Process*>();
 }
 
-Scheduler::~Scheduler() {}
+Scheduler::~Scheduler() {
+    for (Process* process : processes)
+        delete process;
+}
 
-void Scheduler::add_process(Process * p) {
+void Scheduler::add_process(Process* p) {
     processes.push_back(p);
 }
 
