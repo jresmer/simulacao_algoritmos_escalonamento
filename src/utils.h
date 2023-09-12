@@ -76,12 +76,12 @@ private:
     long int sp;            //stackPointer
     long int pc;            //programCounter
     long int st;            //status?
-    long int * gp;          //registradores
+    long int* gp;          //registradores
 
 public:
     CPU();
     ~CPU();
-    void run(Process* p);             //IMPLEMENTAR
+    void run(Process* p);
     void set_context(context *c);
     context* get_context();
 };

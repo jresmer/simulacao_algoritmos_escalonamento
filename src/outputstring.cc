@@ -27,7 +27,7 @@ void OutputString::printInit() {
 }
 
 void OutputString::printLine(vector<Process*> procecess) {
-    cout << time << "-" << time+1 << "     ";
+    cout << setfill('0') << setw(2) << time << "-" << setw(2) << time + 1 << "   ";
 
     for (int i = 0; i < n_processes; ++i) {
         State p_state = NotCreated;
