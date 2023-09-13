@@ -16,6 +16,6 @@ int ProcessParams::get_duration() {
 	return duration;
 }
 
-int ProcessParams::get_duration() {
-	return priority;
+int ProcessParams::get_priority() {
+    return priority;
 }

@@ -4,36 +4,48 @@
 using namespace std;
 using namespace utils;
 
-Scheduler::Scheduler() {}
-
-Scheduler::Scheduler(vector<Process*> &p) {
-    processes = p;
+Scheduler::Scheduler() {
+    processes = vector<Process*>();
 }
 
-Scheduler::~Scheduler() {}
+Scheduler::~Scheduler() {
+    for (Process* process : processes)
+        delete process;
+}
 
-void Scheduler::add_process(Process * p) {
+void Scheduler::add_process(Process* p) {
     processes.push_back(p);
 }
 
-void Scheduler::run(int te) {
-    switch(te) {
+int Scheduler::run(int escalonation_type) {
+    int pid;
+    switch(escalonation_type) {
         case 1:
             // first come first serve
-            fcfs();
+            pid = fcfs();
+            break;
         case 2:
             // shortest job first
-            sjf();
+            pid = sjf();
+            break;
         case 3:
             // preemptive priority
-            priority(false);
+            pid = priority(false);
+            break;
         case 4:
-            // non preemptive priority
-            priority(true);
+            // non-preemptive priority
+            pid = priority(true);
+            break;
         case 5:
-            // round robin
-            round_robin();
+            // round-robin
+            pid = round_robin();
+            break;
+        default:
+            pid = -1;
+            break;
     }
+
+    return pid;
 }
 
 bool Scheduler::done() {
