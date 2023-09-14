@@ -8,8 +8,8 @@ OutputString::OutputString() {}
 
 OutputString::OutputString(int np) {
     n_processes = np;
-    time = 0;
-    printInit();
+    time_ = 0;
+    print_init();
 }
 
 OutputString::~OutputString() {
@@ -17,7 +17,7 @@ OutputString::~OutputString() {
 }
 
 // Header of print
-void OutputString::printInit() {
+void OutputString::print_init() {
     cout << "\nTime    ";
     for (int i = 0; i < n_processes; ++i) {
         cout << "P" << i+1 << "    ";
@@ -26,7 +26,7 @@ void OutputString::printInit() {
     cout.flush();
 }
 
-void OutputString::printLine(vector<Process*> procecess) {
+void OutputString::print_line(vector<Process*> &procecess) { // atualizar
     cout << setfill('0') << setw(2) << time << "-" << setw(2) << time + 1 << "   ";
 
     for (int i = 0; i < n_processes; ++i) {
@@ -55,9 +55,9 @@ void OutputString::printLine(vector<Process*> procecess) {
     }
     cout << "\n";
     cout.flush();
-    time++;
+    time_++;
 }
 
-void OutputString::printFinal(int tt, float tme, int nttc) {
+void OutputString::print_final(vector<Process*> &procecess) {
     // Implementar
 }

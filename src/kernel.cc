@@ -1,114 +1,159 @@
 #include "utils.h"
+#include <iterator>
 
 using namespace utils;
+using namespace std;
 
 Kernel::Kernel() {
-    cpu = new CPU();
-    processes = vector<Process *>();
-    processesContext = vector<context *>();
-    processesParameters = vector<ProcessParams *>();
+    process_queue = vector<Process *>();
+    finished_processes = vector<Process *>();
+    processes_context = vector<context *>();
     scheduler = Scheduler();
-    outputString = OutputString();
+    output_string = OutputString();
     created_pid = 0;
-    time = 0;
+    algorithm = FCFS;
 }
 
-Kernel::Kernel(CPU *c, vector<ProcessParams *> p) {
-    cpu = c;
-    processesParameters = p;
-    processes = vector<Process *>();
-    processesContext = vector<context *>();
+explicit Kernel::Kernel(Algorithm a) {
+    process_queue = vector<Process *>();
+    finished_processes = vector<Process *>();
+    processes_context = vector<context *>();
     scheduler = Scheduler();
-    outputString = OutputString(processesParameters.size());
+    output_string = OutputString();
     created_pid = 0;
-    time = 0;
-
+    algorithm = a;
 }
 
 Kernel::~Kernel() {
-    delete cpu; // <- necessario?
 
-    for(int i = 0; i < processes.size() ; i++) {
-        Process *p = processes[i];
-        context *ctx = processesContext[i];
+    for (int i = 0; i < process_queue.size(); ++i) {
+        Process *p = process_queue[i];
         delete p;
-        delete ctx;
     }
-}
 
-void Kernel::run(int tipoDeEscalonamento) {
-    bool executando = true;
-    while (executando)
-    {
-        //Verifica se tem processos a serem criados
-        if (processesParameters.size() > processes.size()) {
-            check_new_process();
-
-        //Verifica se todos os processo criados ja foram finalizados
-        } else {
-            executando = !scheduler.done();
-            if (!executando) { break; }
-        }
-
-        //Roda o escalonador e busca qual processo deverá executar
-        int pid;
-        pid = scheduler.run(tipoDeEscalonamento);
-
-        //Seta o contexto do processo na CPU, faz as alterações e pega o contexto modificado -> VERIFICAR
-        cpu->set_context(processesContext[pid]);
-        cpu->run(processes[pid]);
-        processesContext[pid] = cpu->get_context();
-        /*
-        */
-
-        //Imprime o resultado da execução daquele segundo
-        outputString.printLine(processes);
-
-        //Verifica se o processo executado terminou, caso sim, altera seu estado
-        processes[pid]->check_finished();
-
-        //Incrementa o tempo que se passou
-        time++;
+    for (int i = 0; i < finished_processes.size(); ++i) {
+        Process *p = finished_processes[i];
+        delete p;
     }
-    
-}
 
-//Verifica se precisa criar novos processos ao comparar o tempo atual com o tempo que o processo deve ser criado
-void Kernel::check_new_process() {
-    for(int i = 0; i < processesParameters.size(); i++) {
-        ProcessParams *pp = processesParameters[i];
-        if (pp->get_creation_time() == time) {
-            create_process(pp);
-            created_pid++;
-        }
+    for (int i = 0; i < processes_context.size(); ++i) {
+        Process *p = finished_processes[i];
+        delete p;
     }
 }
 
 //Cria e armazena um processo e seu respectivo contexto
-void Kernel::create_process(ProcessParams *pp) {
-    Process* p = new Process(pp->get_creation_time(), pp->get_duration(), pp->get_priority(), created_pid);
-    processes.push_back(p);
-    scheduler.add_process(p);
+void Kernel::create_process(int creation_time, int priority, int duration) {
+    Process* p = new Process(creation_time, duration, priority, created_pid);
+    process_queue.push_back(p);
 
     context* ctx = new context;
     ctx->pc = 0;
     ctx->sp = 0;
     ctx->status = New;
     ctx->gp = new long int [6];
-    processesContext.push_back(ctx);
+    processes_context.push_back(ctx);
+    created_pid++;
+
+    new_process = true;
+    scheduler_call();
 }
 
 void Kernel::reset() {
-    for (int i = 0; i < processes.size(); ++i) {
-        Process *p = processes[i];
-        context *ctx = processesContext[i];
-        delete ctx;
+    for (int i = 0; i < process_queue.size(); ++i) {
+        Process *p = process_queue[i];
         delete p;
     }
 
-    processes = vector<Process *>();
-    processesContext = vector<context *>();
-    time = 0;
+    for (int i = 0; i < finished_processes.size(); ++i) {
+        Process *p = finished_processes[i];
+        delete p;
+    }
+
+    for (int i = 0; i < processes_context.size(); ++i) {
+        Process *p = finished_processes[i];
+        delete p;
+    }
+
+    process_queue = vector<Process *>();
+    finished_processes = vector<Process *>();
+    processes_context = vector<context *>();
     created_pid = 0;
 
+}
+
+void Kernel::init_io_call() {
+    output_string.print_init();
+}
+
+void Kernel::final_io_call() {
+    output_string.print_final(finished_processes);
+}
+
+void Kernel::io_call() {
+    vector<Process *> aux = vector<Process *>();
+    aux.insert(aux.end(), make_move_iterator(finished_processes.begin()), make_move_iterator(finished_processes.end()));
+    aux.insert(aux.end(), make_move_iterator(process_queue.begin()), make_move_iterator(process_queue.end()));
+
+    output_string.print_line(aux);
+}
+
+void Kernel::set_context(long int * gp, long int sp, long int pc, long int st, context* c) {
+    c -> sp = sp;
+    c -> pc = pc;
+    c -> status = st;
+    for (int i; i < 6; i++)
+        c -> gp[i] = gp[i];
+}
+
+context * Kernel::scheduler_call() {
+    if (! process_queue.size())
+        return NULL;
+
+    State s = process_queue[0] -> get_state();
+    time++;
+
+    // define se se configura caso de escalonamento
+    // escolhe o algoritmo de escalonamento
+    switch (algorithm)
+    {
+    case FCFS:
+        if (s == Finished || new_process) {
+            scheduler.fcfs(process_queue, finished_processes);
+            new_process = false;
+        }
+        break;
+    
+    case SJF:
+        if (s == Finished || new_process) {
+            scheduler.sjf(process_queue, finished_processes);
+            new_process = false;
+        }
+        break;
+
+    case NONPREEMPTIVEPRIO:
+        if (s == Finished || new_process) {
+            scheduler.priority(process_queue, finished_processes, true);
+            new_process = false;
+        }
+        break;
+
+    case PREEMPTIVEPRIO:
+        if (s == Finished || new_process) {
+            scheduler.priority(process_queue, finished_processes, false);
+            new_process = false;
+        }
+        break;
+    
+    case ROUNDROBIN:
+        if (s == Finished || time % 2 == 0 || new_process) {
+            scheduler.round_robin(process_queue, finished_processes);
+            new_process = false;
+        }
+        break;
+    }
+
+    // retorna o contexto do processo escalonado
+    process_queue[0] -> executed();
+    return processes_context[process_queue[0] -> get_pid()];
 }

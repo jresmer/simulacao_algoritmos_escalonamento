@@ -26,12 +26,9 @@ void Process::set_wait_time(int wt) {
     wait_time = wt;
 }
 
-int Process::func() { // incompleto??
+void Process::executed() {
     state = Executing;
     executed_time++;
-    sleep(1); // dormir 1 seg
-
-    return 10;
 }
 
 void Process::check_finished() {
@@ -56,7 +53,7 @@ int Process::get_duration() {
     return duration;
 }
 
-int Process::get_prioity() {
+int Process::get_priority() {
     return priority;
 }
 

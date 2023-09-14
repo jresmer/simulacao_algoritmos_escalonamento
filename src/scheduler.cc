@@ -4,203 +4,132 @@
 using namespace std;
 using namespace utils;
 
-Scheduler::Scheduler() {
-    processes = vector<Process*>();
-}
+Scheduler::Scheduler() {}
 
-Scheduler::~Scheduler() {
-    for (Process* process : processes)
-        delete process;
-}
+Scheduler::~Scheduler() {}
 
-void Scheduler::add_process(Process* p) {
-    processes.push_back(p);
-}
+void Scheduler::fcfs(vector<Process *> &q, vector<Process *> &f) {
+    // recupera o ponteiro para o primeiro processo do vetor
+    Process * p = q.front();
 
-int Scheduler::run(int escalonation_type) {
-    int pid;
-    switch(escalonation_type) {
-        case 1:
-            // first come first serve
-            pid = fcfs();
-            break;
-        case 2:
-            // shortest job first
-            pid = sjf();
-            break;
-        case 3:
-            // preemptive priority
-            pid = priority(false);
-            break;
-        case 4:
-            // non-preemptive priority
-            pid = priority(true);
-            break;
-        case 5:
-            // round-robin
-            pid = round_robin();
-            break;
-        default:
-            pid = -1;
-            break;
+    // verifica se o processo foi terminado
+    if (p -> get_state() == Finished) {
+        // retira o processo do vator "fila"
+        q.erase(q.begin());
+        // adiciona o processo ao vetor de processos finalizados
+        f.push_back(p);
     }
-
-    return pid;
 }
 
-bool Scheduler::done() {
-    // percorre os processos do vetor processes
-    for (int i = 0; i < processes.size(); i++) {
-        // verifica se o processo indexado na posicao i foi finalisado
-        if (processes[i] -> get_state() == Finished)
-            // o processo termminado do vetor
-            processes.erase(processes.begin() + i); 
-    }
-    // verifica se o vetor processes se encontra vazio
-    if (processes.empty())
-        // retorna o valor booleano verdadiro
-        return true;
-    // caso o vetor nao estaja vazio retorna o valor booleano falso
-    return false;
-}
+void Scheduler::sjf (vector<Process *> &q, vector<Process *> &f) {
+    // recupera o ponteiro para o primeiro processo do vetor
+    Process * p = q.front();
 
-int Scheduler::fcfs() {
-    // verefica se ha um processo a ser escalonado
-    if (done())
-        // retorna o valor "-1" que determina que nao houve processo escalonado
-        return -1;
-    // escolhe o primeiro processo
-    return processes[0] -> get_pid();
-}
-
-int Scheduler::sjf () {
-    // verefica se ha um processo a ser escalonado
-    if (done())
-        // retorna o valor "-1" que determina que nao houve processo escalonado
-        return -1; 
-    /*
-    declaracao de variaveis auxiliares:
-    - pid do processo escolhido
-    - duracao do processo
-    - prioridade do proceso
-    - menor duracao encontrada
-    */
-    int pid;
-    int duration;
-    int priority;
-    int shortest_duration = 10E20;    
-    // percorre os processos do vetor processes
-    for (int i = 0; i < processes.size(); i++) {
-        // verifica se o processo e novo
-        if (processes[i] -> get_state() == New) {
-            /*  
-            - seta o estado do processo para ready
-            - atualiza o valor da prioridade do processo
-            */
-            processes[i] -> set_state_ready();
-            priority = processes[i] -> get_duration();
-            processes[i] -> set_priority(priority);
+    // verifica se o processo foi terminado
+    if (p -> get_state() == Finished) {
+        // retira o processo do vetor "fila"
+        q.erase(q.begin());
+        // adiciona o processo ao vetor de processos finalizados
+        f.push_back(p);
+    } else { // se o processo nao terminou
+        // recupera o novo processo
+        Process * new_p = q.back();
+        // seta o estado do processo como "ready", "pronto"
+        new_p -> set_state_ready();
+        // retira o novo processo do vetor "fila"
+        q.pop_back();
+        // seta a duracao como prioridade
+        new_p -> set_priority(new_p -> get_duration());
+        // percorre os processos do vetor processes
+        for (int i = 0; i < q.size(); i++) {
+            // verifica se a prioridade do prox processo e menor
+            if (new_p -> get_priority() < q[i] -> get_priority()) {
+                // recoloca o processo na "fila" na posicao i
+                q.insert(q.begin() + i, new_p);
+                break;
+            }
         }
-        // verifica se o processo esta rodando
-        if (processes[i] -> get_state() == Executing)
-            // retorna o id do processo
-            return processes[i] -> get_pid();
-        // atualiza o valor da variavel auxiliar
-        duration = processes[i] -> get_duration();
-        // verifica se a duracao do processo e a menor ate agora
-        if (duration < shortest_duration) {
-            // atualiza os valores das variaveis auxiliares
-            pid = processes[i] -> get_pid();
-            shortest_duration = duration;
+        // declara variavel auxiliar "priority"
+        int priority;
+        // percorre os processos do vetor processes
+        for (int i = 0; i < q.size(); i++) {
+            // verifica se o processo nao e o escolhido no escalonamento
+            if (q[i] -> get_pid() != q.front() -> get_pid()) {
+                // aumenta a prioeidade do processo
+                priority = q[i] -> get_priority() - 1;
+                q[i] -> set_priority(priority);
+            }
         }
     }
-    // percorre os processos do vetor processes
-    for (int i = 0; i < processes.size(); i++) {
-        // verifica se o processo nao e o escolhido no escalonamento
-        if (processes[i] -> get_pid() != pid) {
-            // aumenta a prioeidade do processo
-            priority = processes[i] -> get_prioity() - 1;
-            processes[i] -> set_priority(priority);
-        }
-    }
-    // retorna o id do processo escalonado
-    return pid;
 }
 
 
-int Scheduler::priority(bool non_preemptive) {
-    // verefica se ha um processo a ser escalonado
-    if (done())
-        // retorna o valor "-1" que determina que nao houve processo escalonado
-        return -1;
-    /*
-    declaracao de variaveis auxiliares:
-    - pid do processo escolhido
-    - maior prioridade
-    - prioridade do processo
-    */
-    int pid;
-    int highest_priority;
-    int priority;
-    // percorre os processos do vetor processes
-    for (int i = 0; i < processes.size(); i++) {
-        // verifica se o processo e novo
-        if (processes[i] -> get_state() == New)
-            // seta o estado do processo para ready
-            processes[i] -> set_state_ready();
-        // verifica se o processo esta rodando
-        if (processes[i] -> get_state() == Executing && non_preemptive) //conferir
-            // retorna o id do processo
-            return processes[i] -> get_pid();
-        // atualiza o valor da variavel auxiliar
-        priority = processes[i] -> get_prioity();
-        // verifica se a prioridade do processo e a maior ate o momento
-        if (priority > highest_priority) {
-            // atualiza o processo escolhido
-            highest_priority = priority;
-            pid = processes[i] -> get_pid();
+void Scheduler::priority(vector<Process *> &q, vector<Process *> &f, bool non_preemptive) {
+    // recupera o ponteiro para o primeiro processo do vetor
+    Process * p = q.front();
+
+    // verifica se o processo foi terminado
+    if (p -> get_state() == Finished) {
+        // retira o processo do vetor "fila"
+        q.erase(q.begin());
+        // adiciona o processo ao vetor de processos finalizados
+        f.push_back(p);
+    } else { // se o processo nao terminou
+        // recupera o novo processo
+        Process * new_p = q.back();
+        // seta o estado do processo como "ready", "pronto"
+        new_p -> set_state_ready();
+        // define preemptividade:
+        int i;
+        if (non_preemptive)
+            i = 1;
+        else
+            i = 0;
+        // percorre os processos do vetor "fila" de processes
+        for (i; i < q.size(); i++) {
+            // verifica se a prioridade do novo processo e maior que a do processo de posicao i
+            if (new_p -> get_priority() > q[i] -> get_priority()) {
+                // coloca o novo processo na posicao i
+                q.insert(q.begin() + i, new_p);
+                break;
+            }
         }
     }
-    // retorna o id do processo escalonado
-    return pid;
 }
 
-int Scheduler::round_robin() {
-    // verefica se ha um processo a ser escalonado
-    if (done())
-        // retorna o valor "-1" que determina que nao houve processo escalonado
-        return -1;
-    // setar todas as prioridades em 2
-    // ao escalornar um processo reduzir sua prioridade em 1
+void Scheduler::round_robin(vector<Process *> &q, vector<Process *> &f) {
+    // recupera o ponteiro para o primeiro processo do vetor
+    Process * p = q.front();
 
-    // percorre os processos do vetor processes
-    for (int i = 0; i < processes.size(); i++) {
-        if (processes[i] -> get_state() == New) {
-            // seta o estado do processo para ready e a prioridade para 2
-            processes[i] -> set_state_ready();
-            processes[i] -> set_priority(2);
+    // verifica se o processo foi terminado
+    if (p -> get_state() == Finished) {
+        // retira o processo do vetor "fila"
+        q.erase(q.begin());
+        // adiciona o processo ao vetor de processos finalizados
+        f.push_back(p);
+    } else { // se o processo nao terminou
+        // verifica se ha um novo processo
+        if (q.back() -> get_state() == New) {
+            // recupera o novo processo
+            Process * new_p = q.back();
+            // seta o estado do processo como "ready", "pronto"
+            new_p -> set_state_ready();
+            // seta a prioridade do novo processo para 2
+            new_p -> set_priority(2);
         }
-        // verifica se o processo rodou por 1 seg
-        if (processes[i] -> get_prioity() == 1) {
-            // atualiza sua prioridade
-            processes[i] -> set_priority(0);
-            // escolhe o processo
-            return processes[i] -> get_pid();
-        }
-        // verifica se o processo ainda nao executou sua vez
-        if (processes[i] -> get_prioity() == 2) {
-            // atualiza sua prioridade
-            processes[i] -> set_priority(1);
-            // escolhe o processo
-            return processes[i] -> get_pid();
+        // declara e inicializa variavel auxiliar priority
+        int priority = q.front() -> get_priority();
+        // verifica se o processo ja foi executado por 2 segs
+        if (priority == 0) {
+            // coloca o processo no fim da "fila"
+            q.push_back(q.front());
+            // retira o processo do inicio da "fila"
+            q.erase(q.begin());
+            // reseta a prioridade do processo
+            q.front() -> set_priority(2);
+        } else {
+            // atualiza a prioridade do processo de acordo com seu tempo de cpu restante ate preempcao
+            q.front() -> set_priority(q.front() -> get_priority() - 1);
         }
     }
-    // percorre os processos do vetor processes
-    for (int i = 0; i < processes.size(); i++)
-        // seta todas as prioridades para 2
-        processes[i] -> set_priority(2);
-    // seta a prioridade do primeiro processo do vetor para 1
-    processes[0] -> set_priority(1);
-    // escalona o primeiro processo do vetor
-    return processes[0] -> get_pid();
 }

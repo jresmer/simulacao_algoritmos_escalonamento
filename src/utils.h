@@ -5,6 +5,7 @@
 #include <chrono> 
 #include <thread>
 #include <unistd.h>
+#include <fstream>
 
 using namespace std;
 
@@ -12,11 +13,20 @@ namespace utils {
 
 enum State
 {
-        New = 1,
-        Ready = 2,
-        Executing = 3,
-        Finished = 4,
-        NotCreated = 5
+    New = 1,
+    Ready = 2,
+    Executing = 3,
+    Finished = 4,
+    NotCreated = 5
+};
+
+enum Algorithm
+{
+    FCFS = 1,
+    SJF = 2,
+    NONPREEMPTIVEPRIO = 3,
+    PREEMPTIVEPRIO = 4,
+    ROUNDROBIN = 5
 };
 
 struct context
@@ -44,31 +54,31 @@ public:
     Process();
     explicit Process(int ct, int d, int p, int id);
     ~Process();
-    int func();
     int get_pid();
     int get_duration();
-    int get_prioity();
+    int get_priority();
     State get_state();
     void set_state_ready();
     void check_finished();
     void set_turnaround(int tt);
     void set_wait_time(int wt);
     void set_priority(int p);
+    void executed();
 };
 
 
 class OutputString {
 private:
-    int time;
+    int time_;
     int n_processes;
 
 public:
     OutputString();
     explicit OutputString(int np);
     ~OutputString();
-    void printInit();
-    void printLine(vector<Process*> p);
-    void printFinal(int tt, float tme, int nttc);
+    void print_init();
+    void print_line(vector<Process*> &processes);
+    void print_final(vector<Process*> &procecess);
 };
 
 class CPU {
@@ -77,31 +87,27 @@ private:
     long int pc;            //programCounter
     long int st;            //status?
     long int* gp;          //registradores
+    CreatorProcess* creator;
+    Kernel kernel;
 
-public:
+public: 
     CPU();
     ~CPU();
-    void run(Process* p);
-    void set_context(context *c);
-    context* get_context();
+    void run();
+    void set_so(Kernel &k);
 };
 
 
 class Scheduler {
 private:
-    vector<Process *> processes;
-    int fcfs();
-    int sjf ();
-    int priority(bool non_preemptive);
-    int round_robin();
 
 public:
     Scheduler();
-    explicit Scheduler(vector<Process *> &p);
     ~Scheduler();
-    bool done();
-    int run(int te);
-    void add_process(Process * p);
+    void fcfs(vector<Process *> &q, vector<Process *> &f);
+    void sjf (vector<Process *> &q, vector<Process *> &f);
+    void priority(vector<Process *> &q, vector<Process *> &f, bool non_preemptive);
+    void round_robin(vector<Process *> &q, vector<Process *> &f);
 };
 
 
@@ -125,24 +131,59 @@ private:
 
 class Kernel {
 private:
-    CPU *cpu;
     Scheduler scheduler;
-    OutputString outputString;
+    OutputString output_string;
     vector<ProcessParams *> processesParameters;
-    vector<Process *> processes;
-    vector<context *> processesContext;
-    int time;
+    vector<Process *> finished_processes;
+    vector<Process *> process_queue;
+    vector<context *> processes_context;
     int created_pid;
+    int time;
+    Algorithm algorithm;
+    bool new_process = false;
 
 public:
     Kernel();
-    explicit Kernel(CPU *c, vector<ProcessParams *> pp);
+    explicit Kernel(Algorithm a);
     ~Kernel();
-    void run(int te);
-    void check_new_process();
-    void create_process(ProcessParams *pp);
+    void create_process(int creation_time, int priority, int duration);
     void reset();
+    context* scheduler_call();
+    void init_io_call();
+    void final_io_call();
+    void io_call();
+    void set_context(long int * gp, long int sp, long int pc, long int st, context* c);
+};
 
+class File
+{
+
+public:
+	File();
+	
+	~File();
+
+	void read_file();
+
+	void print_processes_params();
+
+    vector<ProcessParams *> get_process_params();
+
+private:
+	vector<ProcessParams *> processes;
+	ifstream myfile; 
+};
+
+class CreatorProcess {
+private:
+    vector<ProcessParams *> process_params;
+    Kernel * kernel;
+    File input_file;
+    int time = 0;
+public:
+    CreatorProcess();
+    ~CreatorProcess();
+    void syscall();
 };
 
 
