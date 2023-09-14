@@ -2,7 +2,11 @@
 
 using namespace utils;
 
-CreatorProcess::CreatorProcess() {}
+explicit CreatorProcess::CreatorProcess(Kernel * k) {
+    input_file.read_file();
+    process_params = input_file.get_process_params();
+    kernel = k;
+}
 
 CreatorProcess::~CreatorProcess() {}
 

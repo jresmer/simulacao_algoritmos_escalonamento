@@ -8,7 +8,7 @@ CPU::CPU() {
     st = 0;
     gp = new long int[6];
     kernel = Kernel();
-    creator = new CreatorProcess();
+    creator = new CreatorProcess(&kernel);
 }
 
 CPU::~CPU() {

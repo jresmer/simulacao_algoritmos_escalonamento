@@ -181,7 +181,7 @@ private:
     File input_file;
     int time = 0;
 public:
-    CreatorProcess();
+    explicit CreatorProcess(Kernel * k);
     ~CreatorProcess();
     void syscall();
 };
