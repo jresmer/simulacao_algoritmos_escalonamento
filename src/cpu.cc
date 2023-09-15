@@ -7,7 +7,6 @@ CPU::CPU() {
     pc = 0;
     st = 0;
     gp = new long int[6];
-    kernel = Kernel();
     creator = new CreatorProcess(&kernel);
 }
 
@@ -55,8 +54,8 @@ void CPU::run() {
                 gp[i] -= rand() % 700;
             }
 
-            
 
+ 
             kernel.set_context(gp, sp, pc, st, c);
         }
 
