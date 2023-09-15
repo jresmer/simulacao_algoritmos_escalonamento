@@ -69,33 +69,15 @@ public:
 
 class OutputString {
 private:
-    int time_;
-    int n_processes;
 
 public:
     OutputString();
-    explicit OutputString(int np);
     ~OutputString();
     void print_init();
-    void print_line(vector<Process*> &processes);
+    void print_line(vector<Process*> &processes, int time);
     void print_final(vector<Process*> &procecess);
 };
 
-class CPU {
-private:
-    long int sp;            //stackPointer
-    long int pc;            //programCounter
-    long int st;            //status?
-    long int* gp;          //registradores
-    CreatorProcess* creator;
-    Kernel kernel;
-
-public: 
-    CPU();
-    ~CPU();
-    void run();
-    void set_so(Kernel &k);
-};
 
 
 class Scheduler {
@@ -138,7 +120,7 @@ private:
     vector<Process *> process_queue;
     vector<context *> processes_context;
     int created_pid;
-    int time;
+    int kernel_time;
     Algorithm algorithm;
     bool new_process = false;
 
@@ -153,6 +135,7 @@ public:
     void final_io_call();
     void io_call();
     void set_context(long int * gp, long int sp, long int pc, long int st, context* c);
+    void set_algorithm(Algorithm a);
 };
 
 class File
@@ -160,7 +143,7 @@ class File
 
 public:
 	File();
-	
+
 	~File();
 
 	void read_file();
@@ -171,20 +154,36 @@ public:
 
 private:
 	vector<ProcessParams *> processes;
-	ifstream myfile; 
+	ifstream myfile;
 };
 
 class CreatorProcess {
 private:
     vector<ProcessParams *> process_params;
-    Kernel * kernel;
+    Kernel* kernel;
     File input_file;
-    int time = 0;
+    int creator_time;
 public:
-    explicit CreatorProcess(Kernel * k);
+    CreatorProcess();
+    CreatorProcess(Kernel* k);
     ~CreatorProcess();
     void syscall();
 };
 
+class CPU {
+private:
+    long int sp;            //stackPointer
+    long int pc;            //programCounter
+    long int st;            //status?
+    long int* gp;          //registradores
+    CreatorProcess* creator;
+    Kernel kernel;
+
+public:
+    CPU();
+    ~CPU();
+    void run();
+    void set_so(Kernel &k);
+};
 
 } // closing namespace utils

@@ -4,9 +4,9 @@
 using namespace std;
 using namespace utils;
 
-Scheduler::Scheduler() {}
+Scheduler::Scheduler() = default;
 
-Scheduler::~Scheduler() {}
+Scheduler::~Scheduler() = default;
 
 void Scheduler::fcfs(vector<Process *> &q, vector<Process *> &f) {
     // recupera o ponteiro para o primeiro processo do vetor
