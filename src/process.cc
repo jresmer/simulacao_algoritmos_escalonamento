@@ -29,6 +29,8 @@ void Process::set_wait_time(int wt) {
 void Process::executed() {
     state = Executing;
     executed_time++;
+
+    check_finished();
 }
 
 void Process::check_finished() {

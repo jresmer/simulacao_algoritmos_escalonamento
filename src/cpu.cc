@@ -8,6 +8,7 @@ CPU::CPU() {
     st = 0;
     gp = new long int[6];
     creator = new CreatorProcess(&kernel);
+
 }
 
 CPU::~CPU() {
@@ -22,13 +23,17 @@ void CPU::set_so(Kernel &k) {
 void CPU::run() {
     // declara variavel auxiliar "context"
     context * c;
+
+    //Inicializa o input
+    kernel.init_io_call();
+
     while (1) {
         // da tempo de cpu para que a processo criador crie processos filhos se for necessario
         creator -> syscall();
         // da tempo de cpu para que o kernel rode o escalanador caso necessario
         c = kernel.scheduler_call();
         // se nao houver processo escalonado encerra a simulacao (contexto da simulacao)
-        if (c == NULL) {
+        if (c == nullptr) {
             kernel.final_io_call();
             break;
         } else {
@@ -55,8 +60,8 @@ void CPU::run() {
             }
 
 
- 
             kernel.set_context(gp, sp, pc, st, c);
+            kernel.io_call();
         }
 
     }

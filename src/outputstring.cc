@@ -4,31 +4,29 @@
 using namespace utils;
 using std::setw;
 
-OutputString::OutputString() {}
+OutputString::OutputString() = default;
 
-OutputString::OutputString(int np) {
-    n_processes = np;
-    time_ = 0;
-    print_init();
-}
 
-OutputString::~OutputString() {
-
-}
+OutputString::~OutputString() = default;
 
 // Header of print
 void OutputString::print_init() {
     cout << "\nTime    ";
+
+    /*
     for (int i = 0; i < n_processes; ++i) {
         cout << "P" << i+1 << "    ";
     }
+    */
+
     cout << "\n";
     cout.flush();
 }
 
-void OutputString::print_line(vector<Process*> &procecess) { // atualizar
-    cout << setfill('0') << setw(2) << time << "-" << setw(2) << time + 1 << "   ";
+void OutputString::print_line(vector<Process*> &procecess, int time_) { // atualizar
+    cout << setfill('0') << setw(2) << time_ << "-" << setw(2) << time_ + 1 << "   ";
 
+    /*
     for (int i = 0; i < n_processes; ++i) {
         State p_state = NotCreated;
 
@@ -53,9 +51,9 @@ void OutputString::print_line(vector<Process*> &procecess) { // atualizar
                 break;
         }
     }
+    */
     cout << "\n";
     cout.flush();
-    time_++;
 }
 
 void OutputString::print_final(vector<Process*> &procecess) {

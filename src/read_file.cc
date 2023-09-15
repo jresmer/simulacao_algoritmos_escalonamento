@@ -7,8 +7,30 @@ using namespace utils;
 
 int main()
 {
-	File f;
-	f.read_file();
-	f.print_processes_params();
+    CPU cpu = CPU();
+    Kernel kernel = Kernel(FCFS);
+
+    cpu.set_so(kernel);
+    cpu.run();
+    kernel.reset();
+
+    kernel.set_algorithm(SJF);
+    cpu.set_so(kernel);
+    cpu.run();
+    kernel.reset();
+
+    kernel.set_algorithm(NONPREEMPTIVEPRIO);
+    cpu.set_so(kernel);
+    cpu.run();
+    kernel.reset();
+
+    kernel.set_algorithm(PREEMPTIVEPRIO);
+    cpu.set_so(kernel);
+    cpu.run();
+    kernel.reset();
+
+    kernel.set_algorithm(ROUNDROBIN);
+    cpu.set_so(kernel);
+    cpu.run();
 
 }

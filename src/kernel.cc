@@ -11,15 +11,17 @@ Kernel::Kernel() {
     scheduler = Scheduler();
     output_string = OutputString();
     created_pid = 0;
+    kernel_time = 0;
     algorithm = FCFS;
 }
 
-explicit Kernel::Kernel(Algorithm a) {
+Kernel::Kernel(Algorithm a) {
     process_queue = vector<Process *>();
     finished_processes = vector<Process *>();
     processes_context = vector<context *>();
     scheduler = Scheduler();
     output_string = OutputString();
+    kernel_time = 0;
     created_pid = 0;
     algorithm = a;
 }
@@ -79,7 +81,7 @@ void Kernel::reset() {
     finished_processes = vector<Process *>();
     processes_context = vector<context *>();
     created_pid = 0;
-
+    kernel_time = 0;
 }
 
 void Kernel::init_io_call() {
@@ -95,23 +97,27 @@ void Kernel::io_call() {
     aux.insert(aux.end(), make_move_iterator(finished_processes.begin()), make_move_iterator(finished_processes.end()));
     aux.insert(aux.end(), make_move_iterator(process_queue.begin()), make_move_iterator(process_queue.end()));
 
-    output_string.print_line(aux);
+    output_string.print_line(aux, kernel_time);
 }
 
-void Kernel::set_context(long int * gp, long int sp, long int pc, long int st, context* c) {
+void Kernel::set_context(long int* gp, long int sp, long int pc, long int st, context* c) {
     c -> sp = sp;
     c -> pc = pc;
     c -> status = st;
-    for (int i; i < 6; i++)
+    for (int i = 0; i < 6; i++)
         c -> gp[i] = gp[i];
 }
 
+void Kernel::set_algorithm(Algorithm a) {
+    algorithm = a;
+}
+
 context * Kernel::scheduler_call() {
-    if (! process_queue.size())
-        return NULL;
+    if (process_queue.empty())
+        return nullptr;
 
     State s = process_queue[0] -> get_state();
-    time++;
+    kernel_time++;
 
     // define se se configura caso de escalonamento
     // escolhe o algoritmo de escalonamento
@@ -146,7 +152,7 @@ context * Kernel::scheduler_call() {
         break;
     
     case ROUNDROBIN:
-        if (s == Finished || time % 2 == 0 || new_process) {
+        if (s == Finished || kernel_time % 2 == 0 || new_process) {
             scheduler.round_robin(process_queue, finished_processes);
             new_process = false;
         }
