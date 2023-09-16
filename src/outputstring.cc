@@ -20,12 +20,12 @@ void OutputString::print_init() {
 void OutputString::print_line(vector<Process*> &procecess, int time_) { // atualizar
     cout << setfill('0') << setw(2) << time_ << "-" << setw(2) << time_ + 1 << "   ";
 
-    for (int i = 0; i < procecess.size(); ++i) {
+    for (long unsigned int i = 0; i < procecess.size(); ++i) {
         State p_state = NotCreated;
 
         if (i < procecess.size()) {
-            for (int j = 0; j < procecess.size(); ++j) {
-                if (procecess[j]->get_pid() == i) {
+            for (long unsigned int j = 0; j < procecess.size(); ++j) {
+                if (static_cast<unsigned long int>(procecess[j]->get_pid()) == i) {
                     p_state = procecess[i]->get_state();
                     break;
                 }

@@ -29,17 +29,17 @@ Kernel::Kernel(Algorithm a) {
 
 Kernel::~Kernel() {
 
-    for (int i = 0; i < process_queue.size(); ++i) {
+    for (long unsigned int i = 0; i < process_queue.size(); ++i) {
         Process *p = process_queue[i];
         delete p;
     }
 
-    for (int i = 0; i < processes.size(); ++i) {
+    for (long unsigned int i = 0; i < processes.size(); ++i) {
         Process *p = processes[i];
         delete p;
     }
 
-    for (int i = 0; i < processes_context.size(); ++i) {
+    for (long unsigned int i = 0; i < processes_context.size(); ++i) {
         context *c = processes_context[i];
         delete c;
     }
@@ -64,17 +64,17 @@ void Kernel::create_process(int creation_time, int priority, int duration) {
 }
 
 void Kernel::reset() {
-    for (int i = 0; i < process_queue.size(); ++i) {
+    for (long unsigned int i = 0; i < process_queue.size(); ++i) {
         Process *p = process_queue[i];
         delete p;
     }
 
-    for (int i = 0; i < processes.size(); ++i) {
+    for (long unsigned int i = 0; i < processes.size(); ++i) {
         Process *p = processes[i];
         delete p;
     }
 
-    for (int i = 0; i < processes_context.size(); ++i) {
+    for (long unsigned int i = 0; i < processes_context.size(); ++i) {
         context *c = processes_context[i];
         delete c;
     }
@@ -102,7 +102,7 @@ void Kernel::io_call() {
     process_queue[0]->check_finished();
 
     if (process_queue.size() > 1) {
-        for (int i = 1; i < process_queue.size(); ++i) {
+        for (long unsigned int i = 1; i < process_queue.size(); ++i) {
             process_queue[1]->increase_wait_time();
         }
     }

@@ -12,7 +12,7 @@ CreatorProcess::CreatorProcess() {
 CreatorProcess::~CreatorProcess() = default;
 
 void CreatorProcess::syscall() {
-    for (int i = 0; i < process_params.size(); i++) {
+    for (long unsigned int i = 0; i < process_params.size(); i++) {
         if (process_params[i] -> get_creation_time() == creator_time)
             kernel -> create_process(creator_time, process_params[i] -> get_priority(), process_params[i] -> get_duration());
     }

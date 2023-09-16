@@ -1,9 +1,12 @@
 #include "utils.h"
+#include <iostream>
+#include <fstream>
 
 using namespace utils;
 
 File::File() {
-	myfile.open("../input/entrada.txt");
+	const char* inputFilePath = INPUT_FILE;
+	myfile.open(inputFilePath);
 	if (!myfile.is_open()) {
 		cout << "Erro ao abrir o arquivo!\n";
 	}
@@ -11,7 +14,7 @@ File::File() {
 
 
 File::~File() {
-	for(int i = 0; i < processes.size() ; i++) {
+	for(long unsigned int i = 0; i < processes.size() ; i++) {
 		ProcessParams *p = processes[i];
 		delete p;
 	}
