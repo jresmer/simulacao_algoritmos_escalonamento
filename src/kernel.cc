@@ -11,7 +11,7 @@ Kernel::Kernel() {
     scheduler = Scheduler();
     output_string = OutputString();
     created_pid = 0;
-    kernel_time = 0;
+    time = 0;
     algorithm = FCFS;
 }
 
@@ -21,7 +21,7 @@ Kernel::Kernel(Algorithm a) {
     processes_context = vector<context *>();
     scheduler = Scheduler();
     output_string = OutputString();
-    kernel_time = 0;
+    time = 0;
     created_pid = 0;
     algorithm = a;
 }
@@ -81,7 +81,7 @@ void Kernel::reset() {
     processes = vector<Process *>();
     processes_context = vector<context *>();
     created_pid = 0;
-    kernel_time = 0;
+    time = 0;
 }
 
 void Kernel::init_io_call() {
@@ -93,7 +93,7 @@ void Kernel::final_io_call() {
 }
 
 void Kernel::io_call() {
-    output_string.print_line(processes, kernel_time);
+    output_string.print_line(processes, time);
 }
 
 void Kernel::set_algorithm(Algorithm a) {
@@ -107,7 +107,7 @@ Process * Kernel::scheduler_call() {
     // recupera o estado do processo em execucao
     State s = process_queue[0] -> get_state();
     // atualiza o contador de tempo
-    kernel_time++;
+    time++;
 
     // define se se configura caso de escalonamento
     // escolhe o algoritmo de escalonamento
@@ -158,7 +158,7 @@ Process * Kernel::scheduler_call() {
         break;
     
     case ROUNDROBIN:
-        if (s == Finished || kernel_time % 2 == 0 || new_process) {
+        if (s == Finished || time % 2 == 0 || new_process) {
             // recupera o contexto da cpu
             set_context(cpu_ -> get_context(), process_queue[0] -> get_pid());
             // chama o escalonador

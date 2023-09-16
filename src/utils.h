@@ -120,7 +120,7 @@ private:
     vector<Process *> process_queue;
     vector<context *> processes_context;
     int created_pid;
-    int kernel_time;
+    int time;
     Algorithm algorithm;
     bool new_process = false;
     CPU* cpu_;
