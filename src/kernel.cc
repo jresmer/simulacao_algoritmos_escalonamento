@@ -140,7 +140,7 @@ Process * Kernel::scheduler_call() {
             // recupera o contexto da cpu
             set_context(cpu_ -> get_context(), process_queue[0] -> get_pid());
             // chama o escalonador
-            scheduler.priority(process_queue, true);
+            scheduler.non_preemptive_prio(process_queue);
             // garante o valor "false" para a variavel booleana "new_process"
             new_process = false;
         }
@@ -151,7 +151,7 @@ Process * Kernel::scheduler_call() {
             // recupera o contexto da cpu
             set_context(cpu_ -> get_context(), process_queue[0] -> get_pid());
             // chama o escalonador
-            scheduler.priority(process_queue, false);
+            scheduler.preemptive_prio(process_queue);
             // garante o valor "false" para a variavel booleana "new_process"
             new_process = false;
         }
