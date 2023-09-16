@@ -3,9 +3,10 @@
 using namespace utils;
 
 CreatorProcess::CreatorProcess(Kernel * k) {
-    input_file.read_file();
-    input_file.print_processes_params();
-    process_params = input_file.get_process_params();
+    File f;
+    f.read_file();
+    f.print_processes_params();
+    process_params = f.get_process_params();
     kernel = k;
     creator_time = 0;
 }

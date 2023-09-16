@@ -165,7 +165,6 @@ class CreatorProcess {
 private:
     vector<ProcessParams *> process_params;
     Kernel* kernel;
-    File input_file;
     int creator_time;
 public:
     CreatorProcess(Kernel* k);
