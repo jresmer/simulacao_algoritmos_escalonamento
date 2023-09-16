@@ -6,7 +6,7 @@ using namespace std;
 
 Kernel::Kernel() {
     process_queue = vector<Process *>();
-    finished_processes = vector<Process *>();
+    processes = vector<Process *>();
     processes_context = vector<context *>();
     scheduler = Scheduler();
     output_string = OutputString();
@@ -17,7 +17,7 @@ Kernel::Kernel() {
 
 Kernel::Kernel(Algorithm a) {
     process_queue = vector<Process *>();
-    finished_processes = vector<Process *>();
+    processes = vector<Process *>();
     processes_context = vector<context *>();
     scheduler = Scheduler();
     output_string = OutputString();
@@ -33,14 +33,14 @@ Kernel::~Kernel() {
         delete p;
     }
 
-    for (int i = 0; i < finished_processes.size(); ++i) {
-        Process *p = finished_processes[i];
+    for (int i = 0; i < processes.size(); ++i) {
+        Process *p = processes[i];
         delete p;
     }
 
     for (int i = 0; i < processes_context.size(); ++i) {
-        Process *p = finished_processes[i];
-        delete p;
+        context *c = processes_context[i];
+        delete c;
     }
 }
 
@@ -67,18 +67,18 @@ void Kernel::reset() {
         delete p;
     }
 
-    for (int i = 0; i < finished_processes.size(); ++i) {
-        Process *p = finished_processes[i];
+    for (int i = 0; i < processes.size(); ++i) {
+        Process *p = processes[i];
         delete p;
     }
 
     for (int i = 0; i < processes_context.size(); ++i) {
-        Process *p = finished_processes[i];
-        delete p;
+        context *c = processes_context[i];
+        delete c;
     }
 
     process_queue = vector<Process *>();
-    finished_processes = vector<Process *>();
+    processes = vector<Process *>();
     processes_context = vector<context *>();
     created_pid = 0;
     kernel_time = 0;
@@ -89,34 +89,24 @@ void Kernel::init_io_call() {
 }
 
 void Kernel::final_io_call() {
-    output_string.print_final(finished_processes);
+    output_string.print_final(processes);
 }
 
 void Kernel::io_call() {
-    vector<Process *> aux = vector<Process *>();
-    aux.insert(aux.end(), make_move_iterator(finished_processes.begin()), make_move_iterator(finished_processes.end()));
-    aux.insert(aux.end(), make_move_iterator(process_queue.begin()), make_move_iterator(process_queue.end()));
-
-    output_string.print_line(aux, kernel_time);
-}
-
-void Kernel::set_context(long int* gp, long int sp, long int pc, long int st, context* c) {
-    c -> sp = sp;
-    c -> pc = pc;
-    c -> status = st;
-    for (int i = 0; i < 6; i++)
-        c -> gp[i] = gp[i];
+    output_string.print_line(processes, kernel_time);
 }
 
 void Kernel::set_algorithm(Algorithm a) {
     algorithm = a;
 }
 
-context * Kernel::scheduler_call() {
+Process * Kernel::scheduler_call() {
+    // confere se ha processsos na "fila"
     if (process_queue.empty())
         return nullptr;
-
+    // recupera o estado do processo em execucao
     State s = process_queue[0] -> get_state();
+    // atualiza o contador de tempo
     kernel_time++;
 
     // define se se configura caso de escalonamento
@@ -125,41 +115,80 @@ context * Kernel::scheduler_call() {
     {
     case FCFS:
         if (s == Finished || new_process) {
-            scheduler.fcfs(process_queue, finished_processes);
+            // recupera o contexto da cpu
+            set_context(cpu_ -> get_context(), process_queue[0] -> get_pid());
+            // chama o escalonador
+            scheduler.fcfs(process_queue);
+            // garante o valor "false" para a variavel booleana "new_process"
             new_process = false;
         }
         break;
     
     case SJF:
         if (s == Finished || new_process) {
-            scheduler.sjf(process_queue, finished_processes);
+            // recupera o contexto da cpu
+            set_context(cpu_ -> get_context(), process_queue[0] -> get_pid());
+            // chama o escalonador
+            scheduler.sjf(process_queue);
+            // garante o valor "false" para a variavel booleana "new_process"
             new_process = false;
         }
         break;
 
     case NONPREEMPTIVEPRIO:
         if (s == Finished || new_process) {
-            scheduler.priority(process_queue, finished_processes, true);
+            // recupera o contexto da cpu
+            set_context(cpu_ -> get_context(), process_queue[0] -> get_pid());
+            // chama o escalonador
+            scheduler.priority(process_queue, true);
+            // garante o valor "false" para a variavel booleana "new_process"
             new_process = false;
         }
         break;
 
     case PREEMPTIVEPRIO:
         if (s == Finished || new_process) {
-            scheduler.priority(process_queue, finished_processes, false);
+            // recupera o contexto da cpu
+            set_context(cpu_ -> get_context(), process_queue[0] -> get_pid());
+            // chama o escalonador
+            scheduler.priority(process_queue, false);
+            // garante o valor "false" para a variavel booleana "new_process"
             new_process = false;
         }
         break;
     
     case ROUNDROBIN:
         if (s == Finished || kernel_time % 2 == 0 || new_process) {
-            scheduler.round_robin(process_queue, finished_processes);
+            // recupera o contexto da cpu
+            set_context(cpu_ -> get_context(), process_queue[0] -> get_pid());
+            // chama o escalonador
+            scheduler.round_robin(process_queue);
+            // garante o valor "false" para a variavel booleana "new_process"
             new_process = false;
         }
         break;
     }
 
-    // retorna o contexto do processo escalonado
-    process_queue[0] -> executed();
-    return processes_context[process_queue[0] -> get_pid()];
+    // seta o contexto do processo na cpu
+    cpu_ -> set_context(processes_context[process_queue[0] -> get_pid()]);
+    // retorna um ponteiro para o processo escalonado
+    return process_queue[0];
+}
+
+context* Kernel::get_context(int pid) {
+    return processes_context[pid];
+}
+
+void Kernel::set_context(context c, int pid) {
+    // atualiza os valores dos registradores - sp, pc, st - do processo de cujo process id e "pid"
+    processes_context[pid] -> sp = c.sp;
+    processes_context[pid] -> pc = c.pc;
+    processes_context[pid] -> status = c.status;
+    // atualiza os valores dos registradores de proposito geral do processo de cujo process id e "pid"
+    for (int i = 0; i < 6; i++)
+        processes_context[pid] -> gp[i] = c.gp[i];
+}
+
+void Kernel::set_cpu(CPU* cpu) {
+    cpu_ = cpu;
 }

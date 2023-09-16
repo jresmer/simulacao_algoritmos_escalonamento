@@ -63,7 +63,7 @@ public:
     void set_turnaround(int tt);
     void set_wait_time(int wt);
     void set_priority(int p);
-    void executed();
+    void run(long int* gp, long int* sp, long int* pc, long int* st);
 };
 
 
@@ -86,10 +86,10 @@ private:
 public:
     Scheduler();
     ~Scheduler();
-    void fcfs(vector<Process *> &q, vector<Process *> &f);
-    void sjf (vector<Process *> &q, vector<Process *> &f);
-    void priority(vector<Process *> &q, vector<Process *> &f, bool non_preemptive);
-    void round_robin(vector<Process *> &q, vector<Process *> &f);
+    void fcfs(vector<Process *> &q);
+    void sjf (vector<Process *> &q);
+    void priority(vector<Process *> &q, bool non_preemptive);
+    void round_robin(vector<Process *> &q);
 };
 
 
@@ -116,13 +116,14 @@ private:
     Scheduler scheduler;
     OutputString output_string;
     vector<ProcessParams *> processesParameters;
-    vector<Process *> finished_processes;
+    vector<Process *> processes;
     vector<Process *> process_queue;
     vector<context *> processes_context;
     int created_pid;
     int kernel_time;
     Algorithm algorithm;
     bool new_process = false;
+    CPU* cpu_;
 
 public:
     Kernel();
@@ -130,12 +131,14 @@ public:
     ~Kernel();
     void create_process(int creation_time, int priority, int duration);
     void reset();
-    context* scheduler_call();
+    Process* scheduler_call();
     void init_io_call();
     void final_io_call();
     void io_call();
-    void set_context(long int * gp, long int sp, long int pc, long int st, context* c);
     void set_algorithm(Algorithm a);
+    void set_cpu(CPU* cpu);
+    context* get_context(int pid);
+    void set_context(context c, int pid);
 };
 
 class File
@@ -164,7 +167,6 @@ private:
     File input_file;
     int creator_time;
 public:
-    CreatorProcess();
     CreatorProcess(Kernel* k);
     ~CreatorProcess();
     void syscall();
@@ -184,6 +186,8 @@ public:
     ~CPU();
     void run();
     void set_so(Kernel &k);
+    void set_context(context* c);
+    context get_context();
 };
 
 } // closing namespace utils

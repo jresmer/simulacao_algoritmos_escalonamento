@@ -26,9 +26,26 @@ void Process::set_wait_time(int wt) {
     wait_time = wt;
 }
 
-void Process::executed() {
+void Process::run(long int* gp, long int* sp, long int* pc, long int* st) {
     state = Executing;
     executed_time++;
+
+    // altera valor do sp
+    sp += rand() % 1000;
+    sp -= rand() % 700;
+    // altera valor do pc
+    pc += rand() % 1000;
+    pc -= rand() % 700;
+    // altera valor do registrador de status
+    st += rand() % 1000;
+    st -= rand() % 700;
+    // altera os valores dos registradores de proposito geral
+    for (int i = 0; i < 6; i++) {
+        gp[i] += rand() % 1000;
+        gp[i] -= rand() % 700;
+    }
+
+    sleep(1);
 
     check_finished();
 }
