@@ -64,7 +64,7 @@ void Scheduler::sjf (vector<Process *> &q) {
 }
 
 
-void Scheduler::priority(vector<Process *> &q, bool non_preemptive) {
+void Scheduler::preemptive_prio(vector<Process *> &q) {
     // recupera o ponteiro para o primeiro processo do vetor
     Process * p = q.front();
 
@@ -77,14 +77,8 @@ void Scheduler::priority(vector<Process *> &q, bool non_preemptive) {
         Process * new_p = q.back();
         // seta o estado do processo como "ready", "pronto"
         new_p -> set_state_ready();
-        // define preemptividade:
-        int i;
-        if (non_preemptive)
-            i = 1;
-        else
-            i = 0;
         // percorre os processos do vetor "fila" de processes
-        for (i; i < q.size(); i++) {
+        for (int i = 0; i < q.size(); i++) {
             // verifica se a prioridade do novo processo e maior que a do processo de posicao i
             if (new_p -> get_priority() > q[i] -> get_priority()) {
                 // coloca o novo processo na posicao i
@@ -93,6 +87,42 @@ void Scheduler::priority(vector<Process *> &q, bool non_preemptive) {
                 if (i == 0)
                     // atualiza o estado do processo preemptado
                     q.front() -> set_state_ready();
+                break;
+            }
+        }
+    }
+    // declara variavel auxiliar "priority"
+    int priority;
+    // percorre os processos do vetor processes
+    for (int i = 0; i < q.size(); i++) {
+        // verifica se o processo nao e o escolhido no escalonamento
+        if (q[i] -> get_pid() != q.front() -> get_pid()) {
+            // aumenta a prioeidade do processo
+            priority = q[i] -> get_priority() - 1;
+            q[i] -> set_priority(priority);
+        }
+    }
+}
+
+void Scheduler::non_preemptive_prio(vector<Process *> &q) {
+    // recupera o ponteiro para o primeiro processo do vetor
+    Process * p = q.front();
+
+    // verifica se o processo foi terminado
+    if (p -> get_state() == Finished) {
+        // retira o processo do vetor "fila"
+        q.erase(q.begin());
+    } else { // se o processo nao terminou
+        // recupera o novo processo
+        Process * new_p = q.back();
+        // seta o estado do processo como "ready", "pronto"
+        new_p -> set_state_ready();
+        // percorre os processos do vetor "fila" de processes
+        for (int i = 1; i < q.size(); i++) {
+            // verifica se a prioridade do novo processo e maior que a do processo de posicao i
+            if (new_p -> get_priority() > q[i] -> get_priority()) {
+                // coloca o novo processo na posicao i
+                q.insert(q.begin() + i, new_p);
                 break;
             }
         }

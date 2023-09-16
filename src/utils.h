@@ -88,7 +88,8 @@ public:
     ~Scheduler();
     void fcfs(vector<Process *> &q);
     void sjf (vector<Process *> &q);
-    void priority(vector<Process *> &q, bool non_preemptive);
+    void non_preemptive_prio(vector<Process *> &q);
+    void preemptive_prio(vector<Process *> &q);
     void round_robin(vector<Process *> &q);
 };
 
