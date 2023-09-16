@@ -140,7 +140,7 @@ void Scheduler::non_preemptive_prio(vector<Process *> &q) {
     }
 }
 
-void Scheduler::round_robin(vector<Process *> &q) {
+void Scheduler::round_robin(vector<Process *> &q, bool quantus) {
     // recupera o ponteiro para o primeiro processo do vetor
     Process * p = q.front();
 
@@ -156,10 +156,13 @@ void Scheduler::round_robin(vector<Process *> &q) {
             // seta o estado do processo como "ready", "pronto"
             new_p -> set_state_ready();
         }
+        if (quantus) {
         // atualiza o estado do processo preemptado
         q.front() -> set_state_ready();
         // coloca o processo no fim da "fila"
         q.push_back(q.front());
         // retira o processo do inicio da "fila"
         q.erase(q.begin());
+        }
+    }
 }
