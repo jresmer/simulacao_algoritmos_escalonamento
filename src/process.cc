@@ -18,12 +18,12 @@ Process::Process(int ct, int d, int p, int id) {
 
 Process::~Process() = default;
 
-void Process::set_turnaround(int tt) {
-    turnaround_time = tt;
+void Process::set_turnaround() {
+    turnaround_time = duration + wait_time;
 }
 
-void Process::set_wait_time(int wt) {
-    wait_time = wt;
+void Process::increase_wait_time() {
+    wait_time++;
 }
 
 void Process::run(long int* gp, long int* sp, long int* pc, long int* st) {
@@ -45,14 +45,14 @@ void Process::run(long int* gp, long int* sp, long int* pc, long int* st) {
         gp[i] -= rand() % 700;
     }
 
-    sleep(1);
+    //sleep(1);
 
-    check_finished();
 }
 
 void Process::check_finished() {
     if (executed_time == duration) {
         state = Finished;
+        set_turnaround();
     }
 }
 

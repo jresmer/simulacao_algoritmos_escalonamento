@@ -33,7 +33,10 @@ void OutputString::print_line(vector<Process*> &procecess, int time_) { // atual
         }
 
         switch (p_state) {
-            case Ready or New:
+            case New:
+                cout << "--    ";
+                break;
+            case Ready:
                 cout << "--    ";
                 break;
             case Executing:

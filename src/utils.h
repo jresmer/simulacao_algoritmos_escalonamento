@@ -34,7 +34,7 @@ struct context
     long int sp;
     long int pc;
     long int status;
-    long int * gp;
+    long int * gp = new long int[6];
 };
 
 
@@ -60,8 +60,8 @@ public:
     State get_state();
     void set_state_ready();
     void check_finished();
-    void set_turnaround(int tt);
-    void set_wait_time(int wt);
+    void set_turnaround();
+    void increase_wait_time();
     void set_priority(int p);
     void run(long int* gp, long int* sp, long int* pc, long int* st);
 };
@@ -141,6 +141,7 @@ private:
     Algorithm algorithm;
     bool new_process = false;
     CPU* cpu_;
+    int t_context_changes;
 
 public:
     Kernel();

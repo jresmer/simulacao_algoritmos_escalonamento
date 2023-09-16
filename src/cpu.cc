@@ -30,7 +30,6 @@ void CPU::set_context(context* c) {
 
 context CPU::get_context() {
     context c;
-
     c.sp = sp;
     c.pc = pc;
     c.status = st;

@@ -40,12 +40,12 @@ void Scheduler::sjf (vector<Process *> &q) {
             if (new_p -> get_priority() < q[i] -> get_priority()) {
                 // retira o novo processo do vetor "fila"
                 q.pop_back();
-                // recoloca o processo na "fila" na posicao i
-                q.insert(q.begin() + i, new_p);
                 // verefica se houve preempcao
                 if (i == 0)
                     // atualiza o estado do processo preemptado
                     q.front() -> set_state_ready();
+                // recoloca o processo na "fila" na posicao i
+                q.insert(q.begin() + i, new_p);
                 break;
             }
         }
@@ -81,22 +81,23 @@ void Scheduler::preemptive_prio(vector<Process *> &q) {
         for (int i = 0; i < q.size(); i++) {
             // verifica se a prioridade do novo processo e maior que a do processo de posicao i
             if (new_p -> get_priority() > q[i] -> get_priority()) {
-                // coloca o novo processo na posicao i
-                q.insert(q.begin() + i, new_p);
+                // retira o novo processo do vetor "fila"
+                q.pop_back();
+
                 // verefica se houve preempcao
                 if (i == 0)
                     // atualiza o estado do processo preemptado
                     q.front() -> set_state_ready();
+
+                // coloca o novo processo na posicao i
+                q.insert(q.begin() + i, new_p);
                 break;
             }
         }
-    }
-    // declara variavel auxiliar "priority"
-    int priority;
-    // percorre os processos do vetor processes
-    for (int i = 0; i < q.size(); i++) {
-        // verifica se o processo nao e o escolhido no escalonamento
-        if (q[i] -> get_pid() != q.front() -> get_pid()) {
+        // declara variavel auxiliar "priority"
+        int priority;
+        // percorre os processos do vetor processes
+        for (int i = 1; i < q.size(); i++) {
             // aumenta a prioeidade do processo
             priority = q[i] -> get_priority() - 1;
             q[i] -> set_priority(priority);
@@ -121,18 +122,17 @@ void Scheduler::non_preemptive_prio(vector<Process *> &q) {
         for (int i = 1; i < q.size(); i++) {
             // verifica se a prioridade do novo processo e maior que a do processo de posicao i
             if (new_p -> get_priority() > q[i] -> get_priority()) {
+                // retira o novo processo do vetor "fila"
+                q.pop_back();
                 // coloca o novo processo na posicao i
                 q.insert(q.begin() + i, new_p);
                 break;
             }
         }
-    }
-    // declara variavel auxiliar "priority"
-    int priority;
-    // percorre os processos do vetor processes
-    for (int i = 0; i < q.size(); i++) {
-        // verifica se o processo nao e o escolhido no escalonamento
-        if (q[i] -> get_pid() != q.front() -> get_pid()) {
+        // declara variavel auxiliar "priority"
+        int priority;
+        // percorre os processos do vetor processes
+        for (int i = 1; i < q.size(); i++) {
             // aumenta a prioeidade do processo
             priority = q[i] -> get_priority() - 1;
             q[i] -> set_priority(priority);
