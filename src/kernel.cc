@@ -128,8 +128,6 @@ Process * Kernel::scheduler_call() {
     {
         case FCFS:
             if (s == Finished || new_process) {
-                // recupera o contexto da cpu
-                set_context(cpu_ -> get_context(), p -> get_pid());
                 // chama o escalonador
                 scheduler.fcfs(process_queue);
                 // garante o valor "false" para a variavel booleana "new_process"
