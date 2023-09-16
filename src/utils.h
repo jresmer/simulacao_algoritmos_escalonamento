@@ -64,6 +64,8 @@ public:
     void increase_wait_time();
     void set_priority(int p);
     void run(long int* gp, long int* sp, long int* pc, long int* st);
+    void get_turnaround_time();
+    void get_wait_time();
 };
 
 
