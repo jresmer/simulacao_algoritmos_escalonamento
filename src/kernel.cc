@@ -190,9 +190,10 @@ Process * Kernel::scheduler_call() {
             break;
 
         case ROUNDROBIN:
-            if (s == Finished || time % 2 == 0 || new_process) {
+            bool quantus = time % 2 == 0;
+            if (s == Finished || quantus || new_process) {
                 // chama o escalonador
-                scheduler.round_robin(process_queue);
+                scheduler.round_robin(process_queue, quantus);
                 // garante o valor "false" para a variavel booleana "new_process"
                 new_process = false;
                 if (p != process_queue.front()) {
