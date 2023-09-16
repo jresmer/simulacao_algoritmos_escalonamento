@@ -155,24 +155,11 @@ void Scheduler::round_robin(vector<Process *> &q) {
             Process * new_p = q.back();
             // seta o estado do processo como "ready", "pronto"
             new_p -> set_state_ready();
-            // seta a prioridade do novo processo para 2
-            new_p -> set_priority(2);
         }
-        // declara e inicializa variavel auxiliar priority
-        int priority = q.front() -> get_priority();
-        // verifica se o processo ja foi executado por 2 segs
-        if (priority == 0) {
-            // atualiza o estado do processo preemptado
-            q.front() -> set_state_ready();
-            // coloca o processo no fim da "fila"
-            q.push_back(q.front());
-            // retira o processo do inicio da "fila"
-            q.erase(q.begin());
-            // reseta a prioridade do processo
-            q.front() -> set_priority(2);
-        } else {
-            // atualiza a prioridade do processo de acordo com seu tempo de cpu restante ate preempcao
-            q.front() -> set_priority(q.front() -> get_priority() - 1);
-        }
-    }
+        // atualiza o estado do processo preemptado
+        q.front() -> set_state_ready();
+        // coloca o processo no fim da "fila"
+        q.push_back(q.front());
+        // retira o processo do inicio da "fila"
+        q.erase(q.begin());
 }
