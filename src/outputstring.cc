@@ -11,13 +11,7 @@ OutputString::~OutputString() = default;
 
 // Header of print
 void OutputString::print_init() {
-    cout << "\nTime    ";
-
-    /*
-    for (int i = 0; i < n_processes; ++i) {
-        cout << "P" << i+1 << "    ";
-    }
-    */
+    cout << "\nTime  ->   Processes";
 
     cout << "\n";
     cout.flush();
@@ -26,8 +20,7 @@ void OutputString::print_init() {
 void OutputString::print_line(vector<Process*> &procecess, int time_) { // atualizar
     cout << setfill('0') << setw(2) << time_ << "-" << setw(2) << time_ + 1 << "   ";
 
-    /*
-    for (int i = 0; i < n_processes; ++i) {
+    for (int i = 0; i < procecess.size(); ++i) {
         State p_state = NotCreated;
 
         if (i < procecess.size()) {
@@ -51,7 +44,7 @@ void OutputString::print_line(vector<Process*> &procecess, int time_) { // atual
                 break;
         }
     }
-    */
+
     cout << "\n";
     cout.flush();
 }

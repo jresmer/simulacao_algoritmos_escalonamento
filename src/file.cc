@@ -9,12 +9,14 @@ File::File() {
 	}
 }
 
+
 File::~File() {
 	for(int i = 0; i < processes.size() ; i++) {
 		ProcessParams *p = processes[i];
 		delete p;
 	}
 }
+
 
 void File::print_processes_params()  {
 	vector<ProcessParams *>::iterator iter = processes.begin();

@@ -2,12 +2,10 @@
 
 using namespace utils;
 
-CreatorProcess::CreatorProcess(Kernel * k) {
-    File f;
-    f.read_file();
-    f.print_processes_params();
-    process_params = f.get_process_params();
-    kernel = k;
+CreatorProcess::CreatorProcess() {
+    input_file.read_file();
+    input_file.print_processes_params();
+    process_params = input_file.get_process_params();
     creator_time = 0;
 }
 
@@ -20,4 +18,8 @@ void CreatorProcess::syscall() {
     }
 
     creator_time++;
+}
+
+void CreatorProcess::set_kernel(Kernel *k) {
+    kernel = k;
 }

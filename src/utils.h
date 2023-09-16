@@ -112,11 +112,27 @@ private:
 };
 
 
+
+class File
+{
+
+public:
+	File();
+	~File();
+	void read_file();
+	void print_processes_params();
+    vector<ProcessParams *> get_process_params();
+
+private:
+	vector<ProcessParams *> processes;
+	ifstream myfile;
+};
+
+class CPU;      //Foward declaration da CPU
 class Kernel {
 private:
     Scheduler scheduler;
     OutputString output_string;
-    vector<ProcessParams *> processesParameters;
     vector<Process *> processes;
     vector<Process *> process_queue;
     vector<context *> processes_context;
@@ -142,35 +158,20 @@ public:
     void set_context(context c, int pid);
 };
 
-class File
-{
-
-public:
-	File();
-
-	~File();
-
-	void read_file();
-
-	void print_processes_params();
-
-    vector<ProcessParams *> get_process_params();
-
-private:
-	vector<ProcessParams *> processes;
-	ifstream myfile;
-};
 
 class CreatorProcess {
 private:
     vector<ProcessParams *> process_params;
     Kernel* kernel;
+    File input_file;
     int creator_time;
 public:
-    CreatorProcess(Kernel* k);
+    CreatorProcess();
     ~CreatorProcess();
     void syscall();
+    void set_kernel(Kernel* k);
 };
+
 
 class CPU {
 private:

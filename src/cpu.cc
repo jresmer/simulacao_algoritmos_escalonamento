@@ -7,8 +7,7 @@ CPU::CPU() {
     pc = 0;
     st = 0;
     gp = new long int[6];
-    creator = new CreatorProcess(&kernel);
-
+    creator = new CreatorProcess();
 }
 
 CPU::~CPU() {
@@ -18,6 +17,7 @@ CPU::~CPU() {
 void CPU::set_so(Kernel &k) {
     kernel = k;
     kernel.set_cpu(this);
+    creator->set_kernel(&kernel);
 }
 
 void CPU::set_context(context* c) {
@@ -42,8 +42,8 @@ context CPU::get_context() {
 
 //IMPLEMENTAR
 void CPU::run() {
-    // declara variavel auxiliar "context"
-    Process * p;
+    // declara variavel auxiliar "process"
+    Process* p;
 
     //Inicializa o input
     kernel.init_io_call();
