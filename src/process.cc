@@ -80,11 +80,11 @@ void Process::set_priority(int p) {
     priority = p;
 }
 
-void Process::get_wait_time() {
+int Process::get_wait_time() {
     return wait_time;
 }
 
-void Process::get_turnaround_time() {
+int Process::get_turnaround_time() {
     return turnaround_time;
 }
 
