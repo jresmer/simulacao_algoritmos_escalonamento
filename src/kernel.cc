@@ -87,7 +87,7 @@ void Kernel::reset() {
 }
 
 void Kernel::init_io_call() {
-    output_string.print_init();
+    output_string.print_init(algorithm);
 }
 
 void Kernel::final_io_call() {

@@ -71,11 +71,12 @@ public:
 
 class OutputString {
 private:
+    string get_algorithm_to_string(Algorithm a);
 
 public:
     OutputString();
     ~OutputString();
-    void print_init();
+    void print_init(Algorithm a);
     void print_line(vector<Process*> &processes, int time);
     void print_final(vector<Process*> &procecess);
 };
@@ -173,6 +174,7 @@ public:
     ~CreatorProcess();
     void syscall();
     void set_kernel(Kernel* k);
+    void reset();
 };
 
 
@@ -192,6 +194,7 @@ public:
     void set_so(Kernel &k);
     void set_context(context* c);
     context get_context();
+    void reset();
 };
 
 } // closing namespace utils

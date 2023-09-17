@@ -5,7 +5,7 @@
 using namespace utils;
 
 File::File() {
-	const char* inputFilePath = INPUT_FILE;
+	const char* inputFilePath = "../input/entrada.txt";
 	myfile.open(inputFilePath);
 	if (!myfile.is_open()) {
 		cout << "Erro ao abrir o arquivo!\n";

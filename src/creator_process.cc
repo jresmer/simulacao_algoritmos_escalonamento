@@ -23,3 +23,7 @@ void CreatorProcess::syscall() {
 void CreatorProcess::set_kernel(Kernel *k) {
     kernel = k;
 }
+
+void CreatorProcess::reset() {
+    creator_time = 0;
+}

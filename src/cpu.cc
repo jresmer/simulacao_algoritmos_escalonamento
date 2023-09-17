@@ -12,6 +12,7 @@ CPU::CPU() {
 
 CPU::~CPU() {
     delete[] gp;
+    delete creator;
 }
 
 void CPU::set_so(Kernel &k) {
@@ -62,4 +63,8 @@ void CPU::run() {
         // gera saida da iteracao (contexto da simulacao)
         kernel.io_call();
     }
+}
+
+void CPU::reset() {
+    creator->reset();
 }

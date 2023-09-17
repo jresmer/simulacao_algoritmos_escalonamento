@@ -10,8 +10,10 @@ OutputString::OutputString() = default;
 OutputString::~OutputString() = default;
 
 // Header of print
-void OutputString::print_init() {
-    cout << "\nTime  ->   Processes";
+void OutputString::print_init(Algorithm a) {
+    string algorithm = get_algorithm_to_string(a);
+
+    cout << "\n\nTime  ->   Processes - " << algorithm;
 
     cout << "\n";
     cout.flush();
@@ -56,14 +58,36 @@ void OutputString::print_final(vector<Process*> &processes) {
     int n_processes = processes.size();
     int turnaround_time = 0;
     int avg_wait_time = 0;
-    // Implementar
+
+    cout << "\n";
+
     for (int i = 0; i < n_processes; i++) {
         turnaround_time += processes[i] -> get_turnaround_time();
         avg_wait_time += processes[i] -> get_wait_time();
         cout << "P" << processes[i] -> get_pid() << " Turnaround Time: " << processes[i] -> get_turnaround_time() << endl;
     }
+
+    cout << "\n";
+
     avg_wait_time = float(avg_wait_time) / float(n_processes);
     cout << "Average Wait Time: " << avg_wait_time << endl;
     turnaround_time = float(turnaround_time) / float(n_processes);
     cout << "Average Turnaround Time: " << turnaround_time << endl;
+}
+
+string OutputString::get_algorithm_to_string (Algorithm a) {
+    switch (a) {
+        case Algorithm::FCFS:
+            return "FCFS";
+        case Algorithm::SJF:
+            return "SJF";
+        case Algorithm::NONPREEMPTIVEPRIO:
+            return "Non-preemptive Priority";
+        case Algorithm::PREEMPTIVEPRIO:
+            return "Preemptive Priority";
+        case Algorithm::ROUNDROBIN:
+            return "Round Robin";
+        default:
+            return "Unknown"; // Handle unknown enum values gracefully
+    }
 }
